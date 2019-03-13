@@ -1,0 +1,20 @@
+version: '3.5'
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: "kpmp-user-mongo"
+    environment:
+      - MONGO_DATA_DIR=/usr/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - kpmp-user:/usr/data/db
+    ports:
+        - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+
+volumes:
+  kpmp-user:
+
+networks: 
+  default:
+    name: kpmp-user-portal
