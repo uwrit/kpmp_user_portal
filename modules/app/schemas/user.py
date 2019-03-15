@@ -4,6 +4,12 @@ from jsonschema.exceptions import ValidationError, SchemaError
 _user_schema = {
     "type": "object",
     "properties": {
+        "target_id": {
+            "type": "string"
+        },
+        "eppn": {
+            "type": "string"
+        },
         "first_name": {
             "type": "string"
         },
