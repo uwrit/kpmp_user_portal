@@ -21,6 +21,8 @@ class JSONEncoder(json.JSONEncoder):
 app = Flask(__name__)
 app.config['MONGO_URI'] = os.environ.get('DB')
 app.json_encoder = JSONEncoder
+
 mongo = PyMongo(app)
 
-from modules.app.controllers import *
+from modules.app.api import api
+app.register_blueprint(api)
