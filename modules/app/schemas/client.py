@@ -11,7 +11,7 @@ _client_schema = {
             "type": "string"
         }
     },
-    "required": ["name", "token"]
+    "required": ["name"]
 }
 
 
