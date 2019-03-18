@@ -27,10 +27,16 @@ _db = os.environ.get('DB')
 if not _db:
     raise EnvironmentError('Missing mongodb connection.')
 
+_env = os.environ.get('ENV')
+if not _env:
+    _env = 'production'
+
+
 app = Flask(__name__)
 
 app.secret_key = _secret
 app.config['MONGO_URI'] = _db
+app.config['ENV'] = _env
 app.json_encoder = JSONEncoder
 
 mongo = PyMongo(app)

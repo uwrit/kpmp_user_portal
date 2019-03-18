@@ -19,4 +19,5 @@ def authenticated():
     g.user = client
 
 
-from .user import get
+from .user import get_users, get_user
+from .org import get_orgs, get_org
