@@ -9,7 +9,6 @@ LOG = logger.get_root_logger(__name__)
 
 @api.route('/api/user', methods=['GET'])
 def get():
-    print(g.user)
     query = request.args
     users = [u for u in mongo.db.users.find(query)]
     return jsonify(users), 200

@@ -12,8 +12,8 @@ def authenticated():
     token = str(request.headers.get('X-API-TOKEN'))
     if not token:
         return jsonify({'ok': False, 'message': 'Unauthenticated.'}), 403
-    client = mongo.db.apps.find_one(
-        {'token': token.encode('utf-8', 'strict')})
+    client = mongo.db.clients.find_one(
+        {'token': token})
     if not client:
         return jsonify({'ok': False, 'message': 'Unauthenticated.'}), 403
     g.user = client

@@ -7,6 +7,9 @@ _org_schema = {
         "name": {
             "type": "string"
         },
+        "care_of": {
+            "type": "string"
+        },
         "street": {
             "type": "string"
         },
