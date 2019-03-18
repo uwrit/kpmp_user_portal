@@ -2,12 +2,15 @@ from flask_admin import Admin
 
 from wtforms import form, fields, validators
 
-from flask_admin.form import Select2Widget
-from flask_admin.contrib.pymongo import ModelView, filters
-from flask_admin.model.fields import FormField
+from flask_admin.contrib.pymongo import ModelView
 from modules.app import mongo, app
 import uuid
 from flask_pymongo import ObjectId
+
+
+def get_org_refs():
+    return [
+        (str(o.get('_id')), o.get('name')) for o in mongo.db.orgs.find()]
 
 
 class UserForm(form.Form):
@@ -22,7 +25,7 @@ class UserForm(form.Form):
         fields.StringField(''), min_entries=1)
     role = fields.StringField('Role')
     job_title = fields.StringField('Job Title')
-    organization_id = fields.SelectField('Organization', coerce=ObjectId)
+    organization_id = fields.SelectField('Organization')
 
 
 class UserView(ModelView):
@@ -34,14 +37,12 @@ class UserView(ModelView):
 
     def create_form(self, obj=None):
         form = super(UserView, self).create_form(obj)
-        form.organization_id.choices = [
-            (o.get('_id'), o.get('name')) for o in mongo.db.orgs.find()]
+        form.organization_id.choices = get_org_refs()
         return form
 
     def edit_form(self, obj=None):
         form = super(UserView, self).edit_form(obj)
-        form.organization_id.choices = [
-            (o.get('_id'), o.get('name')) for o in mongo.db.orgs.find()]
+        form.organization_id.choices = get_org_refs()
 
         if len(obj['phone_numbers']) >= form.phone_numbers.min_entries:
             form.phone_numbers.append_entry()
@@ -53,8 +54,7 @@ class UserView(ModelView):
 
     def validate_form(self, form):
         if hasattr(form, 'organization_id'):
-            form.organization_id.choices = [
-                (o.get('_id'), o.get('name')) for o in mongo.db.orgs.find()]
+            form.organization_id.choices = get_org_refs()
         return super().validate_form(form)
 
     def on_model_change(self, form, model, is_created):
