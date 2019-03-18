@@ -2,9 +2,7 @@ from flask_admin import Admin
 
 from wtforms import form, fields, validators
 
-from flask_admin.form import Select2Widget
-from flask_admin.contrib.pymongo import ModelView, filters
-from flask_admin.model.fields import FormField
+from flask_admin.contrib.pymongo import ModelView
 from modules.app import mongo, app
 import uuid
 from flask_pymongo import ObjectId
