@@ -30,7 +30,7 @@ class UserForm(form.Form):
 
 class UserView(ModelView):
     column_list = ('targetted_id', 'eppn', 'first_name',
-                   'last_name', 'email', 'phone_numbers', 'fax_numbers', 'role', 'job_title', 'organization.name')
+                   'last_name', 'email', 'phone_numbers', 'fax_numbers', 'role', 'job_title', 'organization_id')
     column_sortable_list = ('eppn', 'first_name', 'last_name', 'email', 'role')
 
     form = UserForm
