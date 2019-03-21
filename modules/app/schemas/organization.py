@@ -7,10 +7,19 @@ _org_schema = {
         "name": {
             "type": "string"
         },
+        "code": {
+            "type": "string"
+        },
+        "short_name": {
+            "type": "string"
+        },
         "care_of": {
             "type": "string"
         },
         "street": {
+            "type": "string"
+        },
+        "extended_address": {
             "type": "string"
         },
         "city": {
@@ -21,9 +30,15 @@ _org_schema = {
         },
         "postal_code": {
             "type": "string"
+        },
+        "country_name": {
+            "type": "string"
         }
     },
-    "required": ["name"]
+    "required": ["name"],
+    "dependencies": {
+        "extended_address": [ "street_address" ]
+    }
 }
 
 
