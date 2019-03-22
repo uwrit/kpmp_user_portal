@@ -4,10 +4,7 @@ from jsonschema.exceptions import ValidationError, SchemaError
 _user_schema = {
     "type": "object",
     "properties": {
-        "targetted_id": {
-            "type": "string"
-        },
-        "eppn": {
+        "shib_id": {
             "type": "string"
         },
         "first_name": {
