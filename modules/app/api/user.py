@@ -14,9 +14,9 @@ def get_users():
     return jsonify(users), 200
 
 
-@api.route('/api/user/<string:eppn>', methods=['GET'])
-def get_user(eppn):
-    user = mongo.db.users.find_one({'eppn': eppn})
+@api.route('/api/user/<string:id>', methods=['GET'])
+def get_user(id):
+    user = mongo.db.users.find_one({'shib_id': id})
     if not user:
         return jsonify(), 404
     return jsonify(user), 200

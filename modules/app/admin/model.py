@@ -14,11 +14,11 @@ def get_org_refs():
 
 
 class UserForm(form.Form):
-    targetted_id = fields.StringField('Targetted ID')
-    eppn = fields.StringField('EPPN')
+    shib_id = fields.StringField('Shibboleth ID')
     first_name = fields.StringField('First name', [validators.DataRequired()])
     last_name = fields.StringField('Last name', [validators.DataRequired()])
-    email = fields.StringField('Email', [validators.Optional(), validators.Email()])
+    email = fields.StringField(
+        'Email', [validators.Optional(), validators.Email()])
     phone_numbers = fields.FieldList(
         fields.StringField(''), min_entries=1)
     fax_numbers = fields.FieldList(
@@ -29,9 +29,10 @@ class UserForm(form.Form):
 
 
 class UserView(ModelView):
-    column_list = ('targetted_id', 'eppn', 'first_name',
+    column_list = ('shib_id', 'first_name',
                    'last_name', 'email', 'phone_numbers', 'fax_numbers', 'role', 'job_title', 'organization_id')
-    column_sortable_list = ('eppn', 'first_name', 'last_name', 'email', 'role')
+    column_sortable_list = ('shib_id', 'first_name',
+                            'last_name', 'email', 'role')
 
     form = UserForm
 
@@ -86,9 +87,10 @@ class OrganizationForm(form.Form):
     city = fields.StringField('City')
     state = fields.StringField('State')
     postal_code = fields.StringField('Postal Code')
-    country_name = fields.SelectField('Country', 
-        choices=[('', ''), ('United States', 'United States'), ('United Kingdom', 'United Kingdom')]
-    )
+    country_name = fields.SelectField('Country',
+                                      choices=[
+                                          ('', ''), ('United States', 'United States'), ('United Kingdom', 'United Kingdom')]
+                                      )
 
     def validate(self):
         rv = super(OrganizationForm, self).validate()
@@ -96,16 +98,17 @@ class OrganizationForm(form.Form):
             return False
 
         if self.extended_address.data and not self.street.data:
-            self.extended_address.errors.append("Street required to define extended")
+            self.extended_address.errors.append(
+                "Street required to define extended")
             return False
         return rv
-       
 
 
 class OrganizationView(ModelView):
-    column_list = ('name', 'short_name', 'code', 'care_of', 'street', 'extended_address','city', 'state', 'postal_code', 'country_name')
+    column_list = ('name', 'short_name', 'code', 'care_of', 'street',
+                   'extended_address', 'city', 'state', 'postal_code', 'country_name')
     column_sortable_list = ('name', 'city', 'state', 'code')
-    
+
     form = OrganizationForm
 
 
