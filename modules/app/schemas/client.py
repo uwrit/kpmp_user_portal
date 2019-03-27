@@ -9,6 +9,13 @@ _client_schema = {
         },
         "token": {
             "type": "string"
+        },
+        "last_changed_by": {
+            "type": "string"
+        },
+        "last_changed_on": {
+            "type": "string",
+            "format": "date-time"
         }
     },
     "required": ["name", "token"]

@@ -33,11 +33,18 @@ _org_schema = {
         },
         "country_name": {
             "type": "string"
+        },
+        "last_changed_by": {
+            "type": "string"
+        },
+        "last_changed_on": {
+            "type": "string",
+            "format": "date-time"
         }
     },
     "required": ["name"],
     "dependencies": {
-        "extended_address": [ "street_address" ]
+        "extended_address": ["street_address"]
     }
 }
 

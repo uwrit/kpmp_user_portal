@@ -12,6 +12,7 @@ flask-admin = "*"
 flask-pymongo = "*"
 pymongo = "*"
 jsonschema = "*"
+pytz = "*"
 
 [requires]
 python_version = "3.6"
