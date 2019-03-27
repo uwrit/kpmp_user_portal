@@ -33,6 +33,13 @@ _user_schema = {
         },
         "organization_id": {
             "type": "string"
+        },
+        "last_changed_by": {
+            "type": "string"
+        },
+        "last_changed_on": {
+            "type": "string",
+            "format": "date-time"
         }
     },
     "required": ["first_name", "last_name"]
