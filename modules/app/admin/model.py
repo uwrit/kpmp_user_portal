@@ -9,6 +9,7 @@ import uuid
 import datetime
 import pytz
 from flask_pymongo import ObjectId
+from modules.logger import log
 
 _timezone = pytz.timezone('US/Pacific')
 
@@ -73,6 +74,34 @@ class UserView(ModelView):
 
     form = UserForm
 
+    def create_model(self, form):
+        try:
+            return super().create_model(form)
+        except Exception as e:
+            log.error("could not create user", exc_info=e,
+                      remote_user=request.remote_user)
+            raise
+
+    def update_model(self, form, model):
+        try:
+            log.info("updating user",
+                     remote_user=request.remote_user, id=model['_id'])
+            return super().update_model(form, model)
+        except Exception as e:
+            log.error("could not update user", exc_info=e,
+                      remote_user=request.remote_user, id=model['_id'])
+            raise
+
+    def delete_model(self, model):
+        try:
+            log.info("deleting user",
+                     remote_user=request.remote_user, id=model['_id'])
+            return super().delete_model(model)
+        except Exception as e:
+            log.error("could not delete user", exc_info=e,
+                      remote_user=request.remote_user, id=model['_id'])
+            raise
+
     def create_form(self, obj=None):
         form = super().create_form(obj)
         form.organization_id.choices = _get_org_refs()
@@ -99,25 +128,35 @@ class UserView(ModelView):
         return super().validate_form(form)
 
     def on_model_change(self, form, model, is_created):
-        model['phone_numbers'] = [pn for pn in model['phone_numbers'] if pn]
+        model['phone_numbers'] = [
+            pn for pn in model['phone_numbers'] if pn]
         model['fax_numbers'] = [fn for fn in model['fax_numbers'] if fn]
         model['last_changed_by'] = request.remote_user
         model['last_changed_on'] = datetime.datetime.utcnow()
         if not is_created:
-            self._archive_model(model)
+            self._archive_model(model, 'update')
         return super().on_model_change(form, model, is_created)
 
-    def _archive_model(self, model):
+    def on_model_delete(self, model):
+        self._archive_model(model, 'delete')
+        return super().on_model_delete(model)
+
+    def _archive_model(self, model, action):
         old = mongo.db.users.find_one({'_id': model['_id']})
         if has_model_changed(old, model):
-            print('archiving')
             old['id'] = old['_id']
             del old['_id']
+            old['action'] = action
+            log.info("archiving user record",
+                     id=old['id'], action=action, remote_user=request.remote_user)
             mongo.db.users_archive.insert_one(old)
 
 
 class ClientForm(form.Form):
     name = fields.StringField('Name', [validators.DataRequired()])
+    owner = fields.StringField('Owner', [validators.DataRequired()])
+    owner_email = fields.StringField(
+        'Email', [validators.DataRequired(), validators.Email()])
     token = ReadonlyStringField(
         'Token', [validators.DataRequired()], default=lambda: str(uuid.uuid4()))
     last_changed_by = ReadonlyStringField(
@@ -127,24 +166,60 @@ class ClientForm(form.Form):
 
 
 class ClientView(ModelView):
-    column_list = ('name', 'token', 'last_changed_by', 'last_changed_on')
-    column_sortable_list = ('name',)
+    column_list = ('name', 'owner', 'owner_email',
+                   'last_changed_by', 'last_changed_on')
+    column_sortable_list = ('name', 'owner')
     column_type_formatters = _formatters
 
     form = ClientForm
+
+    def create_model(self, form):
+        try:
+            return super().create_model(form)
+        except Exception as e:
+            log.error("could not create client", exc_info=e,
+                      remote_user=request.remote_user)
+            raise
+
+    def update_model(self, form, model):
+        try:
+            log.info("updating client",
+                     remote_user=request.remote_user, id=model['_id'])
+            return super().update_model(form, model)
+        except Exception as e:
+            log.error("could not update client", exc_info=e,
+                      remote_user=request.remote_user, id=model['_id'])
+            raise
+
+    def delete_model(self, model):
+        try:
+            log.info("deleting client",
+                     remote_user=request.remote_user, id=model['_id'])
+            return super().delete_model(model)
+        except Exception as e:
+            log.error("could not delete client", exc_info=e,
+                      remote_user=request.remote_user, id=model['_id'])
+            raise
 
     def on_model_change(self, form, model, is_created):
         model['last_changed_by'] = request.remote_user
         model['last_changed_on'] = datetime.datetime.utcnow()
         if not is_created:
-            self._archive_model(model)
+            self._archive_model(model, 'update')
         return super().on_model_change(form, model, is_created)
 
-    def _archive_model(self, model):
+    def on_model_delete(self, model):
+        self._archive_model(model, 'delete')
+        return super().on_model_delete(model)
+
+    def _archive_model(self, model, action):
         old = mongo.db.clients.find_one({'_id': model['_id']})
         if has_model_changed(old, model):
             old['id'] = old['_id']
             del old['_id']
+            old['action'] = action
+            log.info("archiving client record",
+                     id=old['id'], action=action, remote_user=request.remote_user)
             mongo.db.clients_archive.insert_one(old)
 
 
@@ -187,18 +262,53 @@ class OrganizationView(ModelView):
 
     form = OrganizationForm
 
+    def create_model(self, form):
+        try:
+            return super().create_model(form)
+        except Exception as e:
+            log.error("could not create org", exc_info=e,
+                      remote_user=request.remote_user)
+            raise
+
+    def update_model(self, form, model):
+        try:
+            log.info("updating org", remote_user=request.remote_user,
+                     id=model['_id'])
+            return super().update_model(form, model)
+        except Exception as e:
+            log.error("could not update org", exc_info=e,
+                      remote_user=request.remote_user, id=model['_id'])
+            raise
+
+    def delete_model(self, model):
+        try:
+            log.info("deleting org", remote_user=request.remote_user,
+                     id=model['_id'])
+            return super().delete_model(model)
+        except Exception as e:
+            log.error("could not delete org", exc_info=e,
+                      remote_user=request.remote_user, id=model['_id'])
+            raise
+
     def on_model_change(self, form, model, is_created):
         model['last_changed_by'] = request.remote_user
         model['last_changed_on'] = datetime.datetime.utcnow()
         if not is_created:
-            self._archive_model(model)
+            self._archive_model(model, 'update')
         return super().on_model_change(form, model, is_created)
 
-    def _archive_model(self, model):
+    def on_model_delete(self, model):
+        self._archive_model(model, 'delete')
+        return super().on_model_delete(model)
+
+    def _archive_model(self, model, action):
         old = mongo.db.orgs.find_one({'_id': model['_id']})
         if has_model_changed(old, model):
             old['id'] = old['_id']
             del old['_id']
+            old['action'] = action
+            log.info("archiving org record",
+                     id=old['id'], action=action, remote_user=request.remote_user)
             mongo.db.orgs_archive.insert_one(old)
 
 

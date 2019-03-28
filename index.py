@@ -1,4 +1,5 @@
 ''' index file for Flask API '''
+from modules import logger
 from modules.app import app
 import os
 
