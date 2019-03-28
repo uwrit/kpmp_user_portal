@@ -7,6 +7,13 @@ _client_schema = {
         "name": {
             "type": "string"
         },
+        "owner": {
+            "type": "string"
+        },
+        "owner_email": {
+            "type": "string",
+            "format": "email"
+        },
         "token": {
             "type": "string"
         },
@@ -18,7 +25,7 @@ _client_schema = {
             "format": "date-time"
         }
     },
-    "required": ["name", "token"]
+    "required": ["name", "owner", "owner_email", "token"]
 }
 
 

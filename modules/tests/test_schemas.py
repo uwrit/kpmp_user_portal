@@ -32,6 +32,8 @@ class TestClientSchema(unittest.TestCase):
         data = {
             "_id": "123456",
             "name": "some-app.kpmp.org",
+            "owner": "John",
+            "owner_email": "jdoe@email.tld",
             "token": str(uuid.uuid4())
         }
         res = validate_client(data)
@@ -40,7 +42,8 @@ class TestClientSchema(unittest.TestCase):
     def test_invalid_client(self):
         data = {
             "_id": "123456",
-            "name": "some-app.kpmp.org"
+            "name": "some-app.kpmp.org",
+            "token": str(uuid.uuid4())
         }
         res = validate_client(data)
         self.assertFalse(res['ok'])

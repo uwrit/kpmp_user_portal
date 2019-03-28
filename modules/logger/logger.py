@@ -1,26 +1,28 @@
-''' logging module '''
-import os
 import logging
+import sys
+import structlog
 
-def get_root_logger(name, filename=None):
-    ''' get the logger '''
-    logger = logging.getLogger(name)
-    debug = os.environ.get('ENV', 'production') == 'development'
-    logger.setLevel(logging.DEBUG if debug else logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    stream=sys.stdout,
+)
 
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+structlog.configure(
+    processors=[
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.JSONRenderer()
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
 
-    sh = logging.StreamHandler()
-    sh.setFormatter(formatter)
-    logger.addHandler(sh)
-
-    if filename:
-        fh = logging.FileHandler(filename)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-
-    return logger
-
-def get_child_logger(root_logger, name):
-    return logging.getLogger('.'.join([root_logger, name]))
+log = structlog.get_logger()
