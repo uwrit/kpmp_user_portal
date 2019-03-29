@@ -1,9 +1,11 @@
 import logging
 import sys
 import structlog
+import os
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.INFO if os.environ.get(
+        'ENV') != 'development' else logging.DEBUG,
     format="%(message)s",
     stream=sys.stdout,
 )
