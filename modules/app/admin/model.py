@@ -107,17 +107,17 @@ class UserView(ModelView):
         form.organization_id.choices = _get_org_refs()
         return form
 
-    def edit_form(self, obj=None):
+    def edit_form(self, obj: dict = None):
         if obj.get('last_changed_on'):
             obj['last_changed_on'] = _localize(obj['last_changed_on'])
 
         form = super().edit_form(obj)
         form.organization_id.choices = _get_org_refs()
 
-        if len(obj['phone_numbers']) >= form.phone_numbers.min_entries:
+        if obj.get('phone_numbers') and len(obj.get('phone_numbers')) >= form.phone_numbers.min_entries:
             form.phone_numbers.append_entry()
 
-        if len(obj['fax_numbers']) >= form.fax_numbers.min_entries:
+        if obj.get('fax_numbers') and len(obj.get('fax_numbers')) >= form.fax_numbers.min_entries:
             form.fax_numbers.append_entry()
 
         return form
@@ -127,10 +127,11 @@ class UserView(ModelView):
             form.organization_id.choices = _get_org_refs()
         return super().validate_form(form)
 
-    def on_model_change(self, form, model, is_created):
+    def on_model_change(self, form, model: dict, is_created):
         model['phone_numbers'] = [
-            pn for pn in model['phone_numbers'] if pn]
-        model['fax_numbers'] = [fn for fn in model['fax_numbers'] if fn]
+            pn for pn in model.get('phone_numbers', []) if pn]
+        model['fax_numbers'] = [
+            fn for fn in model.get('fax_numbers', []) if fn]
         model['last_changed_by'] = request.remote_user
         model['last_changed_on'] = datetime.datetime.utcnow()
         if not is_created:
