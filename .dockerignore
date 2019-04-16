@@ -1,1 +1,3 @@
 docker/
+scripts/resetmongo.sh
+data/

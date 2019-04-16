@@ -1,15 +1,14 @@
 FROM centos/python-36-centos7
-
+USER root
 RUN yum update -y
 
 COPY ./requirements.txt /app/requirements.txt
 
 WORKDIR /app
 
-RUN pip install -R requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . /app
 
-ENTRYPOINT [ "python" ]
-
-CMD ["index.py"]
+EXPOSE 5001
+ENTRYPOINT [ "python", "index.py" ]
