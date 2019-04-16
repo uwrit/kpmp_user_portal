@@ -1,2 +1,1 @@
-FROM mongo:centos7
-
+FROM mongo:latest
