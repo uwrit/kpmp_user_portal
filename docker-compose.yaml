@@ -11,11 +11,28 @@ services:
       - "kpmp-mongo-data:/data/db"
     ports:
         - 27017:27017
+    networks:
+      local:
+        aliases:
+          - mongodb
     command: mongod --smallfiles --logpath=/dev/null # --quiet
+
+  # app:
+  #   build:
+  #     context: ./
+  #     dockerfile: ./Dockerfile
+  #   env_file: ./.env
+  #   container_name: "kpmp-user-app"
+  #   ports:
+  #     - 5001:5001
+  #   networks:
+  #     local:
+  #       aliases:
+  #         - app
 
 volumes:
   kpmp-mongo-data:
 
 networks: 
-  default:
-    name: kpmp-user-portal
+  local:
+    driver: bridge
