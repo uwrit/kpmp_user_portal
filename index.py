@@ -3,6 +3,11 @@ from modules import logger
 from modules.app import app
 import os
 
+HOST = None
+_containerd = os.environ.get('FLASK_RUNNING_IN_DOCKER')
+if _containerd and _containerd == 'true':
+    HOST = '0.0.0.0'
+
 PORT = os.environ.get('PORT')
 if PORT:
     PORT = int(PORT)
@@ -11,5 +16,4 @@ else:
 
 if __name__ == "__main__":
     app.config['DEBUG'] = app.config['ENV'] == 'development'
-    host = '0.0.0.0' if app.config['DEBUG'] else None
-    app.run(host=host, port=PORT)
+    app.run(host=HOST, port=PORT)
