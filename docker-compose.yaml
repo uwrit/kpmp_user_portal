@@ -3,6 +3,7 @@ services:
   mongodb:
     build:
       context: ./docker/mongodb
+    env_file: ./.docker.env
     container_name: "kpmp-user-mongo"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
@@ -21,10 +22,8 @@ services:
   #   build:
   #     context: ./
   #     dockerfile: ./Dockerfile
-  #   env_file: ./.env
+  #   env_file: ./.docker.env
   #   container_name: "kpmp-user-app"
-  #   environment:
-  #     - FLASK_RUNNING_IN_DOCKER=true
   #   ports:
   #     - 5001:5001
   #   networks:
