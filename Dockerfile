@@ -11,4 +11,5 @@ RUN pip install -r requirements.txt
 COPY . /app
 
 EXPOSE 5001
-ENTRYPOINT [ "python", "index.py" ]
+ENTRYPOINT [ "python" ]
+CMD [ "index.py" ]

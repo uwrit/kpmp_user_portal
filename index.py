@@ -11,4 +11,5 @@ else:
 
 if __name__ == "__main__":
     app.config['DEBUG'] = app.config['ENV'] == 'development'
-    app.run(port=PORT)
+    host = '0.0.0.0' if app.config['DEBUG'] else None
+    app.run(host=host, port=PORT)
