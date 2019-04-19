@@ -23,6 +23,8 @@ services:
   #     context: ./
   #     dockerfile: ./Dockerfile
   #   env_file: ./.docker.env
+  #   environment:
+  #      - FLASK_RUNNING_IN_DOCKER=true
   #   container_name: "kpmp-user-app"
   #   ports:
   #     - 5001:5001
