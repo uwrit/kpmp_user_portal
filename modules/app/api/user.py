@@ -1,4 +1,3 @@
-import os
 from flask import request, jsonify, g
 from modules.app import mongo
 from modules.app.api import api

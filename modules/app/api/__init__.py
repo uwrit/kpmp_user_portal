@@ -1,5 +1,4 @@
 ''' all api controllers '''
-import os
 import glob
 from flask import Blueprint, request, g, jsonify
 from modules.app import mongo, api
