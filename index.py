@@ -1,14 +1,14 @@
 ''' index file for Flask API '''
-from modules.envi import environ
+from modules.envi import env
 from modules import logger
 from modules.app import app
 
 HOST = None
-_containerd = environ.get('FLASK_RUNNING_IN_DOCKER')
+_containerd = env.get('FLASK_RUNNING_IN_DOCKER')
 if _containerd and _containerd == 'true':
     HOST = '0.0.0.0'
 
-PORT = environ.get('PORT')
+PORT = env.get('PORT')
 if PORT:
     PORT = int(PORT)
 else:

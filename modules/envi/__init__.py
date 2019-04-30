@@ -1,5 +1,5 @@
 if 'environ' in globals():
-    environ = environ
+    env = environ
 else:
     import os
-    environ = os.environ
+    env = os.environ

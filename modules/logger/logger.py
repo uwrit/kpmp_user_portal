@@ -1,10 +1,10 @@
-from modules.envi import environ
+from modules.envi import env
 import logging
 import sys
 import structlog
 
 logging.basicConfig(
-    level=logging.INFO if environ.get(
+    level=logging.INFO if env.get(
         'ENV') != 'development' else logging.DEBUG,
     format="%(message)s",
     stream=sys.stdout,

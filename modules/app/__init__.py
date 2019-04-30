@@ -1,5 +1,5 @@
 ''' bootstrap Flask app with MongoDB '''
-from modules.envi import environ
+from modules.envi import env
 from flask import Flask, request, jsonify
 import json
 from bson.objectid import ObjectId
@@ -18,15 +18,15 @@ class JSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
-_secret = environ.get('SECRET_KEY')
+_secret = env.get('SECRET_KEY')
 if not _secret:
     raise EnvironmentError('Missing secret key.')
 
-_db = environ.get('DB')
+_db = env.get('DB')
 if not _db:
     raise EnvironmentError('Missing mongodb connection.')
 
-_env = environ.get('ENV')
+_env = env.get('ENV')
 if not _env:
     _env = 'production'
 
