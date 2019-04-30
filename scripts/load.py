@@ -1,5 +1,5 @@
 ''' script to load mongodb with existing data '''
-from modules.envi import env
+import os
 from pymongo import MongoClient
 from os import path
 import json
@@ -8,7 +8,7 @@ import logging
 import sys
 
 logging.basicConfig(
-    level=logging.INFO if env.get(
+    level=logging.INFO if os.environ.get(
         'ENV') != 'development' else logging.DEBUG,
     format="%(message)s",
     stream=sys.stdout,
