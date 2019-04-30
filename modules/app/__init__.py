@@ -1,5 +1,5 @@
 ''' bootstrap Flask app with MongoDB '''
-from modules.env import environ
+from modules.envi import environ
 from flask import Flask, request, jsonify
 import json
 from bson.objectid import ObjectId

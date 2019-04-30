@@ -1,4 +1,4 @@
-from modules.env import environ
+from modules.envi import environ
 import logging
 import sys
 import structlog

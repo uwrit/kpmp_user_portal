@@ -1,5 +1,5 @@
 ''' index file for Flask API '''
-from modules.env import environ
+from modules.envi import environ
 from modules import logger
 from modules.app import app
 
