@@ -1,3 +1,10 @@
+# Secrets
+modules/config/config.py
+
+# Deployment
+users.conf
+portal.wsgi
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -80,9 +87,6 @@ celerybeat-schedule
 
 # SageMath parsed files
 *.sage.py
-
-# Secrets
-modules/config/config.py
 
 # Environments
 .env
