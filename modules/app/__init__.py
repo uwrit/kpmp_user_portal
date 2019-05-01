@@ -1,6 +1,6 @@
 ''' bootstrap Flask app with MongoDB '''
 from modules.config import config
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect
 import json
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
@@ -24,6 +24,10 @@ app.config['MONGO_URI'] = config.mongo_uri
 app.config['ENV'] = config.env
 app.config['DEBUG'] = config.env == 'development'
 app.json_encoder = JSONEncoder
+
+@app.route('/', methods=['GET'])
+def index():
+    return redirect('/admin')
 
 mongo = PyMongo(app)
 
