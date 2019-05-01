@@ -1,2 +1,2 @@
-from modules.app import app
+from .run import app
 
