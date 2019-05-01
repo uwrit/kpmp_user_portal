@@ -34,7 +34,7 @@ Create /data/userportal/users.conf
 ```
 kpmpuseradmins: eppns...
 ```
-
+httpd.conf or included .conf.
 ```xml
 <VirtualHost *:443>
     ...Server and SSL config elided
