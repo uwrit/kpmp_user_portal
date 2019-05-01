@@ -1,14 +1,13 @@
 ''' script to load mongodb with existing data '''
-import os
 from pymongo import MongoClient
-from os import path
+from os import path, environ
 import json
 from typing import *
 import logging
 import sys
 
 logging.basicConfig(
-    level=logging.INFO if os.environ.get(
+    level=logging.INFO if environ.get(
         'ENV') != 'development' else logging.DEBUG,
     format="%(message)s",
     stream=sys.stdout,
@@ -58,10 +57,10 @@ class KPMPMongoLoader:
 
 
 def get_mongo():
-    cstr = env.get('DB')
+    cstr = environ.get('DB')
     if not cstr:
         raise EnvironmentError('Database connection string is missing.')
-    return MongoClient(env.get('DB')).get_default_database()
+    return MongoClient(environ.get('DB')).get_default_database()
 
 
 def cache_data():
