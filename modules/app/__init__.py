@@ -22,6 +22,7 @@ app = Flask(__name__)
 app.secret_key = config.secret_key
 app.config['MONGO_URI'] = config.mongo_uri
 app.config['ENV'] = config.env
+app.config['DEBUG'] = config.env == 'development'
 app.json_encoder = JSONEncoder
 
 mongo = PyMongo(app)

@@ -15,7 +15,5 @@ if PORT:
 else:
     PORT = 5001
 
-
 if __name__ == "__main__":
-    app.config['DEBUG'] = app.config['ENV'] == 'development'
     app.run(host=HOST, port=PORT)
