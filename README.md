@@ -13,6 +13,7 @@ In development, set these environment variables in your .env or .docker.env file
 - `SECRET_KEY` = random alphanumeric secret for flask-admin to manage the session, a uuid will do.
 - `ENV` = `development` | `production`
 - Optional: `FLASK_RUNNING_IN_DOCKER` = `true` | `false`
+
 In production, create a `config.py` file in `modules/config` with the following variables:
 - `ENV` = `production`
 - `MONGO_URI` = MongoDB connection string
