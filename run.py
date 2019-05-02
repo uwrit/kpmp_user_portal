@@ -3,8 +3,6 @@ import os
 from modules.app import app
 from modules import logger
 
-application = app
-
 if __name__ == "__main__":
     HOST = None
     _containerd = os.environ.get('FLASK_RUNNING_IN_DOCKER')
