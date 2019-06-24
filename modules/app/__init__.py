@@ -1,10 +1,10 @@
 ''' bootstrap Flask app with MongoDB '''
-from modules.config import config
 from flask import Flask, request, jsonify, redirect
 import json
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
 import datetime
+from os import path
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -19,10 +19,11 @@ class JSONEncoder(json.JSONEncoder):
 
 app = Flask(__name__)
 
-app.secret_key = config.secret_key
-app.config['MONGO_URI'] = config.mongo_uri
-app.config['ENV'] = config.env
-app.config['DEBUG'] = config.env == 'development'
+_config_file = path.join(path.dirname(path.dirname(path.dirname(path.abspath(__file__)))), 'config.json')
+
+app.config.from_json(_config_file)
+app.secret_key = app.config['SECRET_KEY']
+app.config['DEBUG'] = app.config['ENV'] == 'development'
 app.json_encoder = JSONEncoder
 
 @app.route('/', methods=['GET'])
