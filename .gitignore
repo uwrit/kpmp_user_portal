@@ -1,5 +1,6 @@
 # Secrets
 modules/config/config.py
+config.json
 
 # Deployment
 users.conf
