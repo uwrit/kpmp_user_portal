@@ -2,7 +2,7 @@ from flask_admin import Admin
 from flask_admin.model import typefmt
 from wtforms import form, fields, validators
 from flask_admin.contrib.pymongo import ModelView
-from flask import request
+from flask import request, Markup
 from modules.app import mongo, app
 from modules.app.diff import has_model_changed
 import uuid
@@ -23,12 +23,15 @@ def _date_format(view, value):
     loc = _localize(value)
     return loc.strftime("%Y-%m-%d %H:%M:%S %Z")
 
+def _list_format(view, values):
+    return Markup('<br/>'.join(values))
+
 
 _formatters = dict(typefmt.BASE_FORMATTERS)
 _formatters.update({
-    datetime.datetime: _date_format
+    datetime.datetime: _date_format,
+    list: _list_format
 })
-
 
 class ReadonlyStringField(fields.StringField):
     def __call__(self, *args, **kwargs):
@@ -60,6 +63,7 @@ class UserForm(form.Form):
     role = fields.StringField('Role')
     job_title = fields.StringField('Job Title')
     organization_id = fields.SelectField('Organization')
+    groups = fields.FieldList(fields.StringField(''))
     last_changed_by = ReadonlyStringField(
         'Last Changed By', [validators.Optional()])
     last_changed_on = ReadonlyDateTimeField(
@@ -68,12 +72,26 @@ class UserForm(form.Form):
 
 class UserView(ModelView):
     column_list = ('shib_id', 'first_name',
-                   'last_name', 'email', 'phone_numbers', 'fax_numbers', 'role', 'job_title', 'organization_id', 'last_changed_by', 'last_changed_on')
+                   'last_name', 'email', 'groups', 'role', 'organization_id', 'last_changed_by', 'last_changed_on')
     column_sortable_list = ('shib_id', 'first_name',
-                            'last_name', 'email', 'role')
+                            'last_name', 'email', 'groups', 'role')
     column_type_formatters = _formatters
 
     form = UserForm
+
+    def get_list(self, page, sort_column, sort_desc, search, filters, execute=True, page_size=None):
+        try:
+            ls = super().get_list(page, sort_column, sort_desc, search, filters, execute=execute, page_size=page_size)
+            users: Iterable[Dict] = ls[1]
+            to_search = [g['group_id'] for g in mongo.db.groups.find({})]
+            gs = groups.get_for_many([u['shib_id'] for u in users], to_search)
+            for user in users:
+                user['groups'] = gs.get(user['shib_id'])
+            return ls
+        except Exception as e:
+            log.error("could not list memberships", exc_info=e,
+                      remote_user=request.remote_user)
+            raise
 
     def create_model(self, form):
         try:
@@ -111,6 +129,8 @@ class UserView(ModelView):
     def edit_form(self, obj: dict = None):
         if obj.get('last_changed_on'):
             obj['last_changed_on'] = _localize(obj['last_changed_on'])
+        to_search = to_search = [g['group_id'] for g in mongo.db.groups.find({})]
+        obj['groups'] = groups.get_for_one(obj['shib_id'], to_search)
 
         form = super().edit_form(obj)
         form.organization_id.choices = _get_org_refs()
@@ -313,40 +333,6 @@ class OrganizationView(ModelView):
                      id=old['id'], action=action, remote_user=request.remote_user)
             mongo.db.orgs_archive.insert_one(old)
 
-
-class MembershipForm(form.Form):
-    shib_id = fields.StringField('Shibboleth ID')
-    first_name = fields.StringField('First name', [validators.DataRequired()])
-    last_name = fields.StringField('Last name', [validators.DataRequired()])
-    groups = fields.FieldList(fields.StringField('Groups'))
-
-class MembershipView(ModelView):
-    can_create = False
-    can_edit = False
-    can_delete = False
-    
-
-    column_list = ('shib_id', 'first_name',
-                   'last_name', 'groups')
-    column_sortable_list = ('shib_id', 'first_name',
-                            'last_name', 'groups')
-    column_type_formatters = _formatters
-
-    form = MembershipForm
-
-    def get_list(self, page, sort_column, sort_desc, search, filters, execute=True, page_size=None):
-        try:
-            ls = super().get_list(page, sort_column, sort_desc, search, filters, execute=execute, page_size=page_size)
-            users: Iterable[Dict] = ls[1]
-            gs = groups.get_for_many([u['shib_id'] for u in users], ['uw_rit_kpmp_role_developer', 'uw_rit_kpmp_app_userportal'])
-            for user in users:
-                user['groups'] = gs.get(user['shib_id'])
-            return ls
-        except Exception as e:
-            log.error("could not list memberships", exc_info=e,
-                      remote_user=request.remote_user)
-            raise
-
 class GroupForm(form.Form):
     group_id = fields.StringField('Group ID', [validators.DataRequired()])
     last_changed_by = ReadonlyStringField(
@@ -361,9 +347,13 @@ class GroupView(ModelView):
 
     form = GroupForm
 
+    def on_model_change(self, form, model, is_created):
+        model['last_changed_by'] = request.remote_user
+        model['last_changed_on'] = datetime.datetime.utcnow()
+        return super().on_model_change(form, model, is_created)
+
 admin = Admin(app, name='KPMP User Portal Admin Panel')
 admin.add_view(UserView(mongo.db.users, 'Users'))
-admin.add_view(MembershipView(mongo.db.users, 'Membership', endpoint='memberview'))
 admin.add_view(OrganizationView(mongo.db.orgs, 'Organizations'))
 admin.add_view(GroupView(mongo.db.groups, 'Groups'))
 admin.add_view(ClientView(mongo.db.clients, 'Clients'))
