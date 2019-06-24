@@ -14,6 +14,9 @@ pymongo = "*"
 jsonschema = "*"
 pytz = "*"
 structlog = "*"
+uwgs = {editable = true,git = "https://github.com/uwrit/uwgs",ref = "v0.2"}
+requests = "==2.22.0"
+requests-futures = "*"
 
 [requires]
 python_version = "3.6"

@@ -10,6 +10,7 @@ import datetime
 import pytz
 from flask_pymongo import ObjectId
 from modules.logger import log
+from modules.app import groups
 
 _timezone = pytz.timezone('US/Pacific')
 
@@ -313,7 +314,56 @@ class OrganizationView(ModelView):
             mongo.db.orgs_archive.insert_one(old)
 
 
+class MembershipForm(form.Form):
+    shib_id = fields.StringField('Shibboleth ID')
+    first_name = fields.StringField('First name', [validators.DataRequired()])
+    last_name = fields.StringField('Last name', [validators.DataRequired()])
+    groups = fields.FieldList(fields.StringField('Groups'))
+
+class MembershipView(ModelView):
+    can_create = False
+    can_edit = False
+    can_delete = False
+    
+
+    column_list = ('shib_id', 'first_name',
+                   'last_name', 'groups')
+    column_sortable_list = ('shib_id', 'first_name',
+                            'last_name', 'groups')
+    column_type_formatters = _formatters
+
+    form = MembershipForm
+
+    def get_list(self, page, sort_column, sort_desc, search, filters, execute=True, page_size=None):
+        try:
+            ls = super().get_list(page, sort_column, sort_desc, search, filters, execute=execute, page_size=page_size)
+            users: Iterable[Dict] = ls[1]
+            gs = groups.get_for_many([u['shib_id'] for u in users], ['uw_rit_kpmp_role_developer', 'uw_rit_kpmp_app_userportal'])
+            for user in users:
+                user['groups'] = gs.get(user['shib_id'])
+            return ls
+        except Exception as e:
+            log.error("could not list memberships", exc_info=e,
+                      remote_user=request.remote_user)
+            raise
+
+class GroupForm(form.Form):
+    group_id = fields.StringField('Group ID', [validators.DataRequired()])
+    last_changed_by = ReadonlyStringField(
+        'Last Changed By', [validators.Optional()])
+    last_changed_on = ReadonlyDateTimeField(
+        'Last Changed On', [validators.Optional()])
+
+class GroupView(ModelView):
+    column_list = ('group_id', 'last_changed_by', 'last_changed_on')
+    column_sortable_list = ('group_id')
+    column_type_formatters = _formatters
+
+    form = GroupForm
+
 admin = Admin(app, name='KPMP User Portal Admin Panel')
 admin.add_view(UserView(mongo.db.users, 'Users'))
+admin.add_view(MembershipView(mongo.db.users, 'Membership', endpoint='memberview'))
 admin.add_view(OrganizationView(mongo.db.orgs, 'Organizations'))
+admin.add_view(GroupView(mongo.db.groups, 'Groups'))
 admin.add_view(ClientView(mongo.db.clients, 'Clients'))
