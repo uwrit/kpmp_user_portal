@@ -21,7 +21,12 @@ def get_user(id):
         {'shib_id': id}, {'last_changed_by': 0, 'last_changed_on': 0})
     if not user:
         return jsonify(), 404
-    to_search = [g['group_id'] for g in mongo.db.groups.find({})]
-    gms = groups.get_for_one(id, to_search)
+    gms = _get_groups(id)
     user.update({'groups':gms})
     return jsonify(user), 200
+
+def _get_groups(id):
+    to_search = [g['group_id'] for g in mongo.db.groups.find({})]
+    if not to_search:
+        return []
+    return groups.get_for_one(id, to_search)
