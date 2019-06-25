@@ -69,6 +69,16 @@ class UserForm(form.Form):
     last_changed_on = ReadonlyDateTimeField(
         'Last Changed On', [validators.Optional()])
 
+def _organization_id_formatter(view, context, model, name):
+    org_id = model.get('organization_id')
+    if org_id:
+        org = mongo.db.orgs.find_one({'_id': ObjectId(org_id)})
+        if org:
+            return org.get('name')
+        else:
+            return "UnknownOrg ({})".format(org_id)
+    else:
+        return ""
 
 class UserView(ModelView):
     column_list = ('shib_id', 'first_name',
@@ -76,7 +86,11 @@ class UserView(ModelView):
     column_sortable_list = ('shib_id', 'first_name',
                             'last_name', 'email', 'groups', 'role')
     column_type_formatters = _formatters
-
+    column_formatters = dict(organization_id=_organization_id_formatter)
+    
+    column_searchable_list = ('last_name', 'first_name', 'email', 'shib_id')
+    column_labels = dict(organization_id='Organization')
+    
     form = UserForm
 
     def get_list(self, page, sort_column, sort_desc, search, filters, execute=True, page_size=None):
@@ -84,7 +98,7 @@ class UserView(ModelView):
             ls = super().get_list(page, sort_column, sort_desc, search, filters, execute=execute, page_size=page_size)
             users: Iterable[Dict] = ls[1]
             to_search = [g['group_id'] for g in mongo.db.groups.find({})]
-            gs = groups.get_for_many([u['shib_id'] for u in users], to_search)
+            gs = groups.get_for_many([u.get('shib_id') for u in users], to_search)
             for user in users:
                 user['groups'] = gs.get(user['shib_id'])
             return ls
