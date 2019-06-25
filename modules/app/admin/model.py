@@ -347,6 +347,34 @@ class GroupView(ModelView):
 
     form = GroupForm
 
+    def create_model(self, form):
+        try:
+            return super().create_model(form)
+        except Exception as e:
+            log.error("could not create group", exc_info=e,
+                      remote_user=request.remote_user)
+            raise
+
+    def update_model(self, form, model):
+        try:
+            log.info("updating group", remote_user=request.remote_user,
+                     id=model['_id'])
+            return super().update_model(form, model)
+        except Exception as e:
+            log.error("could not update group", exc_info=e,
+                      remote_user=request.remote_user, id=model['_id'])
+            raise
+
+    def delete_model(self, model):
+        try:
+            log.info("deleting group", remote_user=request.remote_user,
+                     id=model['_id'])
+            return super().delete_model(model)
+        except Exception as e:
+            log.error("could not delete group", exc_info=e,
+                      remote_user=request.remote_user, id=model['_id'])
+            raise
+
     def on_model_change(self, form, model, is_created):
         model['last_changed_by'] = request.remote_user
         model['last_changed_on'] = datetime.datetime.utcnow()
