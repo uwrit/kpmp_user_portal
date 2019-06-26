@@ -69,14 +69,16 @@ class UserForm(form.Form):
     last_changed_on = ReadonlyDateTimeField(
         'Last Changed On', [validators.Optional()])
 
-
 class UserView(ModelView):
     column_list = ('shib_id', 'first_name',
-                   'last_name', 'email', 'groups', 'role', 'organization_id', 'last_changed_by', 'last_changed_on')
+                   'last_name', 'email', 'groups', 'role', 'org_name','last_changed_by', 'last_changed_on')
     column_sortable_list = ('shib_id', 'first_name',
-                            'last_name', 'email', 'groups', 'role')
+                            'last_name', 'email', 'groups', 'role', 'org_name')
     column_type_formatters = _formatters
 
+    column_searchable_list = ('last_name', 'first_name', 'email', 'shib_id')
+    column_labels = dict(org_name='Organization')
+    
     form = UserForm
 
     def get_list(self, page, sort_column, sort_desc, search, filters, execute=True, page_size=None):
@@ -85,8 +87,15 @@ class UserView(ModelView):
             users: Iterable[Dict] = ls[1]
             to_search = [g['group_id'] for g in mongo.db.groups.find({})]
             gs = groups.get_for_many([u['shib_id'] for u in users], to_search)
+
+            orgs_dict = {str(x['_id']): x['name'] for x in mongo.db.orgs.find()}
+
             for user in users:
                 user['groups'] = gs.get(user['shib_id'])
+                org_id = user.get('organization_id')
+                if org_id:
+                    user['org_name'] = orgs_dict.get(org_id, "Unknown ({})".format(org_id))
+
             return ls
         except Exception as e:
             log.error("could not list memberships", exc_info=e,
