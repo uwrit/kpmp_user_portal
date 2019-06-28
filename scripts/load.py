@@ -57,10 +57,14 @@ class KPMPMongoLoader:
 
 
 def get_mongo():
-    cstr = environ.get('DB')
-    if not cstr:
-        raise EnvironmentError('Database connection string is missing.')
-    return MongoClient(environ.get('DB')).get_default_database()
+    cfg_path = path.join(path.dirname(path.dirname(path.abspath(__file__))), 'config.json')
+    if not path.exists(cfg_path):
+        raise EnvironmentError('{} file is missing.'.format(cfg_path))
+    with open(cfg_path, 'r') as c:
+        config = json.load(c)
+        if not config.get('MONGO_URI'):
+            raise EnvironmentError('Database connection string is missing.')
+    return MongoClient(config.get('MONGO_URI')).get_default_database()
 
 
 def cache_data():
