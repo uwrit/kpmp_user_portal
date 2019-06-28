@@ -5,6 +5,8 @@ from typing import *
 _client = uwgs.Client(app.config['UWGS_CERT'], app.config['UWGS_KEY'], app.config['UWGS_URL'])
 
 def get_for_one(id: str, group_ids: Iterable[str]) -> Iterable[str]:
+    if not id:
+        return []
     payloads = _client.get_effective_memberships(group_ids)
     return _extract_groups(id, group_ids, payloads)
 
@@ -12,7 +14,8 @@ def get_for_many(ids: Iterable[str], group_ids: Iterable[str]) -> Dict[str, Iter
     payloads = _client.get_effective_memberships(group_ids)
     grps = {}
     for id in ids:
-        grps[id] = _extract_groups(id, group_ids, payloads)
+        if id:
+            grps[id] = _extract_groups(id, group_ids, payloads)
     return grps
 
 

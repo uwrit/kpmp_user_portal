@@ -58,21 +58,21 @@ class OrganizationView(ModelView):
     def update_model(self, form, model):
         try:
             log.info("updating org", remote_user=request.remote_user,
-                     id=model['_id'])
+                     id=model.get('_id'))
             return super().update_model(form, model)
         except Exception as e:
             log.error("could not update org", exc_info=e,
-                      remote_user=request.remote_user, id=model['_id'])
+                      remote_user=request.remote_user, id=model.get('_id'))
             raise
 
     def delete_model(self, model):
         try:
             log.info("deleting org", remote_user=request.remote_user,
-                     id=model['_id'])
+                     id=model.get('_id'))
             return super().delete_model(model)
         except Exception as e:
             log.error("could not delete org", exc_info=e,
-                      remote_user=request.remote_user, id=model['_id'])
+                      remote_user=request.remote_user, id=model.get('_id'))
             raise
 
     def on_model_change(self, form, model, is_created):
@@ -87,11 +87,11 @@ class OrganizationView(ModelView):
         return super().on_model_delete(model)
 
     def _archive_model(self, model, action):
-        old = mongo.db.orgs.find_one({'_id': model['_id']})
+        old = mongo.db.orgs.find_one({'_id': model.get('_id')})
         if has_model_changed(old, model):
-            old['id'] = old['_id']
+            old['id'] = old.get('_id')
             del old['_id']
             old['action'] = action
             log.info("archiving org record",
-                     id=old['id'], action=action, remote_user=request.remote_user)
+                     id=old.get('id'), action=action, remote_user=request.remote_user)
             mongo.db.orgs_archive.insert_one(old)

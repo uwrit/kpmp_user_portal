@@ -24,12 +24,12 @@ _config_file = path.join(path.dirname(path.dirname(path.dirname(path.abspath(__f
 
 app.config.from_json(_config_file)
 app.secret_key = app.config['SECRET_KEY']
-app.config['DEBUG'] = app.config['ENV'] == 'development'
+app.config['DEBUG'] = app.config.get('ENV') == 'development'
 app.json_encoder = JSONEncoder
 
 @app.route('/', methods=['GET'])
 def index():
-    return redirect('/admin')
+    return redirect('/admin/usersview')
 
 mongo = PyMongo(app)
 

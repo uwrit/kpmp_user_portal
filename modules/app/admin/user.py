@@ -1,6 +1,7 @@
 from modules.app import mongo
 from wtforms import fields, validators, form
 from flask_admin.contrib.pymongo import ModelView
+from flask_admin.model.template import BaseListRowAction
 from .fields import ReadonlyDateTimeField, ReadonlyStringField
 from .util import defaultfmt, localize
 from modules.app import groups
@@ -13,6 +14,10 @@ def _get_org_refs():
     return [
         (str(o.get('_id')), o.get('name')) for o in mongo.db.orgs.find()]
 
+
+class SuspendRowAction(BaseListRowAction):
+    def __init__(self, title=None):
+        return super().__init__(title=title)
 
 class UserForm(form.Form):
     shib_id = fields.StringField('Shibboleth ID')
@@ -27,7 +32,8 @@ class UserForm(form.Form):
     role = fields.StringField('Role')
     job_title = fields.StringField('Job Title')
     organization_id = fields.SelectField('Organization')
-    groups = fields.FieldList(fields.StringField(''))
+    groups = fields.FieldList(ReadonlyStringField(''))
+    active = fields.BooleanField('Active', [validators.DataRequired()], default=lambda: True)
     last_changed_by = ReadonlyStringField(
         'Last Changed By', [validators.Optional()])
     last_changed_on = ReadonlyDateTimeField(
@@ -35,13 +41,15 @@ class UserForm(form.Form):
 
 class UserView(ModelView):
     column_list = ('shib_id', 'first_name',
-                   'last_name', 'email', 'groups', 'role', 'org_name','last_changed_by', 'last_changed_on')
+                   'last_name', 'email', 'groups', 'role', 'org_name', 'active', 'last_changed_by', 'last_changed_on')
     column_sortable_list = ('shib_id', 'first_name',
                             'last_name', 'email', 'groups', 'role', 'org_name')
     column_type_formatters = defaultfmt
 
     column_searchable_list = ('last_name', 'first_name', 'email', 'shib_id')
     column_labels = dict(org_name='Organization')
+
+    # column_extra_row_actions = []
     
     form = UserForm
 
@@ -49,13 +57,13 @@ class UserView(ModelView):
         try:
             ls = super().get_list(page, sort_column, sort_desc, search, filters, execute=execute, page_size=page_size)
             users: Iterable[Dict] = ls[1]
-            to_search = [g['group_id'] for g in mongo.db.groups.find({})]
-            gs = groups.get_for_many([u['shib_id'] for u in users], to_search)
+            to_search = [g.get('group_id') for g in mongo.db.groups.find({})]
+            gs = groups.get_for_many([u.get('shib_id') for u in users], to_search)
 
-            orgs_dict = {str(x['_id']): x['name'] for x in mongo.db.orgs.find()}
+            orgs_dict = {x[0]: x[1] for x in _get_org_refs()}
 
             for user in users:
-                user['groups'] = gs.get(user['shib_id'])
+                user['groups'] = gs.get(user.get('shib_id'))
                 org_id = user.get('organization_id')
                 if org_id:
                     user['org_name'] = orgs_dict.get(org_id, "Unknown ({})".format(org_id))
@@ -77,21 +85,21 @@ class UserView(ModelView):
     def update_model(self, form, model):
         try:
             log.info("updating user",
-                     remote_user=request.remote_user, id=model['_id'])
+                     remote_user=request.remote_user, id=model.get('_id'))
             return super().update_model(form, model)
         except Exception as e:
             log.error("could not update user", exc_info=e,
-                      remote_user=request.remote_user, id=model['_id'])
+                      remote_user=request.remote_user, id=model.get('_id'))
             raise
 
     def delete_model(self, model):
         try:
             log.info("deleting user",
-                     remote_user=request.remote_user, id=model['_id'])
+                     remote_user=request.remote_user, id=model.get('_id'))
             return super().delete_model(model)
         except Exception as e:
             log.error("could not delete user", exc_info=e,
-                      remote_user=request.remote_user, id=model['_id'])
+                      remote_user=request.remote_user, id=model.get('_id'))
             raise
 
     def create_form(self, obj=None):
@@ -101,9 +109,9 @@ class UserView(ModelView):
 
     def edit_form(self, obj: dict = None):
         if obj.get('last_changed_on'):
-            obj['last_changed_on'] = localize(obj['last_changed_on'])
-        to_search = to_search = [g['group_id'] for g in mongo.db.groups.find({})]
-        obj['groups'] = groups.get_for_one(obj['shib_id'], to_search)
+            obj['last_changed_on'] = localize(obj.get('last_changed_on'))
+        to_search = to_search = [g.get('group_id') for g in mongo.db.groups.find({})]
+        obj['groups'] = groups.get_for_one(obj.get('shib_id'), to_search)
 
         form = super().edit_form(obj)
         form.organization_id.choices = _get_org_refs()
@@ -137,11 +145,11 @@ class UserView(ModelView):
         return super().on_model_delete(model)
 
     def _archive_model(self, model, action):
-        old = mongo.db.users.find_one({'_id': model['_id']})
+        old = mongo.db.users.find_one({'_id': model.get('_id')})
         if has_model_changed(old, model):
-            old['id'] = old['_id']
+            old['id'] = old.get('_id')
             del old['_id']
             old['action'] = action
             log.info("archiving user record",
-                     id=old['id'], action=action, remote_user=request.remote_user)
+                     id=old.get('id'), action=action, remote_user=request.remote_user)
             mongo.db.users_archive.insert_one(old)

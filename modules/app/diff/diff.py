@@ -4,4 +4,4 @@ def has_model_changed(old: dict, new: dict):
     for ok, ov in items:
         if new.get(ok) != ov:
             return True
-    False
+    return False
