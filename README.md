@@ -2,19 +2,33 @@
 Centralized User Portal API for the KPMP app suite
 
 
-## Deployment Environment
+## Development Environment
+#### Config
+```sh
+git clone https://github.com/uwrit/kpmp_user_portal.git
+cd kpmp_user_portal
+touch config.json
+touch .docker.env
+```
+
+config.json
+```json
+{
+    "MONGO_URI": "mongodb://root:{MONGO_ROOT_PASSWORD}@localhost:27017/kpmp?authSource=admin",
+    "SECRET_KEY": "create_entropy_to_use_here",
+    "ENV": "development",
+    "UWGS_KEY": "~/path/to/your.key",
+    "UWGS_CERT": "~/path/to/your.cert",
+    "UWGS_URL": "groups_version_api_url"
+}
+```
+
 #### Mongo Variables
-- `MONGO_ROOT_USERNAME` = MongoDB root username
-- `MONGO_ROOT_PASSWORD` = MongoDB root user password
+.docker.env
+```env
+MONGO_ROOT_USERNAME=root
+MONGO_ROOT_PASSWORD={MONGO_ROOT_PASSWORD}
+```
+then
 
-#### Flask Variables
-In development, set these environment variables in your .env or .docker.env files:
-- `DB` = MongoDB connection string
-- `SECRET_KEY` = random alphanumeric secret for flask-admin to manage the session, a uuid will do.
-- `ENV` = `development` | `production`
-- Optional: `FLASK_RUNNING_IN_DOCKER` = `true` | `false`
-
-In production, create a `config.py` file in `modules/config` with the following variables:
-- `ENV` = `production`
-- `MONGO_URI` = MongoDB connection string
-- `SECRET_KEY` = random alphanumeric secret for flask-admin to manage the session, a uuid will do.
+`docker-compose up`
