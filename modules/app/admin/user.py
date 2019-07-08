@@ -33,7 +33,7 @@ class UserForm(form.Form):
     job_title = fields.StringField('Job Title')
     organization_id = fields.SelectField('Organization')
     groups = fields.FieldList(ReadonlyStringField(''))
-    active = fields.BooleanField('Active', [validators.DataRequired()], default=lambda: True)
+    active = fields.BooleanField('Active', default=lambda: True)
     last_changed_by = ReadonlyStringField(
         'Last Changed By', [validators.Optional()])
     last_changed_on = ReadonlyDateTimeField(
