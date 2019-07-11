@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d4d56b87c4e720f419485227c39e09f90a6ea7c0a6259b2f25be3f44dd808a55"
+            "sha256": "6d4678bd98084ad61c58ac20c509d30c9f9fb7692a367246d8fea110795d4c0e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -23,20 +23,6 @@
             ],
             "version": "==19.1.0"
         },
-        "certifi": {
-            "hashes": [
-                "sha256:046832c04d4e752f37383b628bc601a7ea7211496b4638f6514d0e5b9acc4939",
-                "sha256:945e3ba63a0b9f577b1395204e13c3a231f9bc0223888be653286534e5873695"
-            ],
-            "version": "==2019.6.16"
-        },
-        "chardet": {
-            "hashes": [
-                "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae",
-                "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"
-            ],
-            "version": "==3.0.4"
-        },
         "click": {
             "hashes": [
                 "sha256:2335065e6395b9e67ca716de5f7526736bfa6ceead690adf616d925bdc622b13",
@@ -46,11 +32,11 @@
         },
         "flask": {
             "hashes": [
-                "sha256:ad7c6d841e64296b962296c2c2dabc6543752985727af86a975072dea984b6f3",
-                "sha256:e7d32475d1de5facaa55e3958bc4ec66d3762076b074296aa50ef8fdc5b9df61"
+                "sha256:13f9f196f330c7c2c5d7a5cf91af894110ca0215ac051b5844701f2bfd934d52",
+                "sha256:45eb5a6fd193d6cf7e0cf5d8a5b31f83d5faae0293695626f539a823e93b13f6"
             ],
             "index": "pypi",
-            "version": "==1.0.3"
+            "version": "==1.1.1"
         },
         "flask-admin": {
             "hashes": [
@@ -66,13 +52,6 @@
             ],
             "index": "pypi",
             "version": "==2.3.0"
-        },
-        "idna": {
-            "hashes": [
-                "sha256:c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407",
-                "sha256:ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"
-            ],
-            "version": "==2.8"
         },
         "itsdangerous": {
             "hashes": [
@@ -165,9 +144,9 @@
         },
         "pyrsistent": {
             "hashes": [
-                "sha256:16692ee739d42cf5e39cef8d27649a8c1fdb7aa99887098f1460057c5eb75c3a"
+                "sha256:50cffebc87ca91b9d4be2dcc2e479272bcb466b5a0487b6c271f7ddea6917e14"
             ],
-            "version": "==0.15.2"
+            "version": "==0.15.3"
         },
         "pytz": {
             "hashes": [
@@ -176,21 +155,6 @@
             ],
             "index": "pypi",
             "version": "==2019.1"
-        },
-        "requests": {
-            "hashes": [
-                "sha256:11e007a8a2aa0323f5a921e9e6a2d7e4e67d9877e85773fba9ba6419025cbeb4",
-                "sha256:9cf5292fcd0f598c671cfc1e0d7d1a7f13bb8085e9a590f48c010551dc6c4b31"
-            ],
-            "index": "pypi",
-            "version": "==2.22.0"
-        },
-        "requests-futures": {
-            "hashes": [
-                "sha256:35547502bf1958044716a03a2f47092a89efe8f9789ab0c4c528d9c9c30bc148"
-            ],
-            "index": "pypi",
-            "version": "==1.0.0"
         },
         "six": {
             "hashes": [
@@ -207,17 +171,13 @@
             "index": "pypi",
             "version": "==19.1.0"
         },
-        "urllib3": {
-            "hashes": [
-                "sha256:b246607a25ac80bedac05c6f282e3cdaf3afb65420fd024ac94435cabe6e18d1",
-                "sha256:dbe59173209418ae49d485b87d1681aefa36252ee85884c31346debd19463232"
-            ],
-            "version": "==1.25.3"
-        },
         "uwgs": {
-            "editable": true,
-            "git": "https://github.com/uwrit/uwgs",
-            "ref": "cf3011893f934b4b77b9ccfc4db88ce02afd9e97"
+            "hashes": [
+                "sha256:37aafedfaf970d6831383570ec33283ce6d23c7cedb958e8f23e95d2acc525c8",
+                "sha256:b04a086b2cef6e7bf0540e375d93575c4503937dce26056bc5b92572168b37eb"
+            ],
+            "index": "pypi",
+            "version": "==0.2.0"
         },
         "werkzeug": {
             "hashes": [

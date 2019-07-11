@@ -2,7 +2,7 @@ attrs==19.1.0
 certifi==2019.6.16
 chardet==3.0.4
 Click==7.0
-Flask==1.0.3
+Flask==1.1.1
 Flask-Admin==1.5.3
 Flask-PyMongo==2.3.0
 idna==2.8
@@ -11,13 +11,13 @@ Jinja2==2.10.1
 jsonschema==3.0.1
 MarkupSafe==1.1.1
 pymongo==3.8.0
-pyrsistent==0.15.2
+pyrsistent==0.15.3
 pytz==2019.1
 requests==2.22.0
 requests-futures==1.0.0
 six==1.12.0
 structlog==19.1.0
 urllib3==1.25.3
--e git+https://github.com/uwrit/uwgs@cf3011893f934b4b77b9ccfc4db88ce02afd9e97#egg=uwgs
+uwgs==0.2.0
 Werkzeug==0.15.4
 WTForms==2.2.1
