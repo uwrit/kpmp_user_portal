@@ -53,6 +53,9 @@ class UserView(ModelView):
     
     form = UserForm
 
+    # Enables csv export of users
+    can_export = True
+
     def get_list(self, page, sort_column, sort_desc, search, filters, execute=True, page_size=None):
         try:
             ls = super().get_list(page, sort_column, sort_desc, search, filters, execute=execute, page_size=page_size)
