@@ -2,6 +2,8 @@ attrs==20.3.0
 certifi==2020.12.5
 chardet==4.0.0
 click==7.1.2
+dnspython==2.1.0
+email-validator==1.1.2
 Flask==1.1.2
 Flask-Admin==1.5.7
 Flask-PyMongo==2.3.0
