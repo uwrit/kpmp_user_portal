@@ -2,7 +2,7 @@ from modules.app import mongo
 from wtforms import fields, validators, form
 from flask_admin.contrib.pymongo import ModelView
 from flask_admin.model.template import BaseListRowAction
-from .fields import ReadonlyDateTimeField, ReadonlyStringField
+from .fields import ReadonlyDateTimeField, ReadonlyStringField, ShibIDField
 from .util import defaultfmt, localize
 from modules.app import groups
 from flask import request
@@ -20,7 +20,7 @@ class SuspendRowAction(BaseListRowAction):
         return super().__init__(title=title)
 
 class UserForm(form.Form):
-    shib_id = fields.StringField('Shibboleth ID')
+    shib_id = ShibIDField('Shibboleth ID')
     first_name = fields.StringField('First name', [validators.DataRequired()])
     last_name = fields.StringField('Last name', [validators.DataRequired()])
     email = fields.StringField(

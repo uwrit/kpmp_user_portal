@@ -16,9 +16,9 @@ def get_users():
 
 @api.route('/api/user/<string:id>', methods=['GET'])
 def get_user(id):
-    log.info("get user", id=id, client=g.user.get('_id'))
+    log.info("get user", id=id.lower(), client=g.user.get('_id'))
     user: dict = mongo.db.users.find_one(
-        {'shib_id': id}, {'last_changed_by': 0, 'last_changed_on': 0})
+        {'shib_id': id.lower()}, {'last_changed_by': 0, 'last_changed_on': 0})
     if not user:
         return jsonify(), 404
     gms = _get_groups(user)
