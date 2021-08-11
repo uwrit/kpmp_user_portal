@@ -14,20 +14,20 @@ def get_users():
         query, {'last_changed_by': 0, 'last_changed_on': 0})]
     return jsonify(users), 200
 
-
 @api.route('/api/user/<string:id>', methods=['GET'])
 def get_user(id):
     log.info("get user", id=id.lower(), client=g.user.get('_id'))
     # user: dict = mongo.db.users.find_one(
     #     {'shib_id': id.lower()}, {'last_changed_by': 0, 'last_changed_on': 0})
-    user: dict = mongo.db.users.find(
-        {'shib_id': id.lower()}, {'last_changed_by': 0, 'last_changed_on': 0}
-        ).collation(Collation(locale='en', strength=2))[0]
-    if not user:
+    try:    
+        user: dict = mongo.db.users.find(
+            {'shib_id': id.lower()}, {'last_changed_by': 0, 'last_changed_on': 0}
+            ).collation(Collation(locale='en', strength=2))[0]
+        gms = _get_groups(user)
+        user.update({'groups': gms})
+        return jsonify(user), 200
+    except:
         return jsonify(), 404
-    gms = _get_groups(user)
-    user.update({'groups': gms})
-    return jsonify(user), 200
 
 def _get_groups(user):
     if not user.get('active'):
