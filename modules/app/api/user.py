@@ -14,6 +14,21 @@ def get_users():
         query, {'last_changed_by': 0, 'last_changed_on': 0})]
     return jsonify(users), 200
 
+# @api.route('/api/user/<string:id>', methods=['GET'])
+# def get_user(id):
+#     log.info("get user", id=id.lower(), client=g.user.get('_id'))
+#     # user: dict = mongo.db.users.find_one(
+#     #     {'shib_id': id.lower()}, {'last_changed_by': 0, 'last_changed_on': 0})
+#     try:    
+#         user: dict = mongo.db.users.find(
+#             {'shib_id': id.lower()}, {'last_changed_by': 0, 'last_changed_on': 0}
+#             ).collation(Collation(locale='en', strength=2))[0]
+#         gms = _get_groups(user)
+#         user.update({'groups': gms})
+#         return jsonify(user), 200
+#     except:
+#         return jsonify(), 404
+
 @api.route('/api/user/<string:id>', methods=['GET'])
 def get_user(id):
     log.info("get user", id=id.lower(), client=g.user.get('_id'))
@@ -25,8 +40,11 @@ def get_user(id):
             ).collation(Collation(locale='en', strength=2))[0]
         gms = _get_groups(user)
         user.update({'groups': gms})
+
         return jsonify(user), 200
-    except:
+    except Exception as e:
+        print(user)
+        log.info("get user exception", exception=e, stack_info=True)
         return jsonify(), 404
 
 def _get_groups(user):
