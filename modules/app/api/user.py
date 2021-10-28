@@ -18,15 +18,33 @@ def get_users():
 def get_user(id):
     log.info("get user", id=id.lower(), client=g.user.get('_id'))
     try:
-        user: dict = mongo.db.users.find_one(
-            {'shib_id': re.compile(id, re.IGNORECASE)}, {'last_changed_by': 0, 'last_changed_on': 0})
-        gms = _get_groups(user)
-        user.update({'groups': gms})
-        
+        # user: dict = mongo.db.users.find_one(
+        #     {'shib_id': re.compile(id, re.IGNORECASE)}, {'last_changed_by': 0, 'last_changed_on': 0})
+        # gms = _get_groups(user)
+        # user.update({'groups': gms})
+        user = _get_user(id)
+
         return jsonify(user), 200
     except Exception as e:
         log.warning("Exception occurred", exception=e)
+        log.info("retry getting user", id=id.lower(), client=g.user.get('_id'))
+
+        user = _get_user(id)
+
+        if (user):
+            return jsonify(user), 200
+
         return jsonify(), 404
+
+        # return jsonify(user), 200 if user else jsonify(), 404
+
+def _get_user(id):
+    user: dict = mongo.db.users.find_one(
+            {'shib_id': re.compile(id, re.IGNORECASE)}, {'last_changed_by': 0, 'last_changed_on': 0})
+    gms = _get_groups(user)
+    user.update({'groups': gms})
+
+    return user
 
 def _get_groups(user):
     if not user.get('active'):
