@@ -1,5 +1,5 @@
+import re
 from flask import request, jsonify, g
-from pymongo.collation import Collation
 from modules.app import mongo
 from modules.app.api import api
 from modules.logger import log
@@ -17,16 +17,15 @@ def get_users():
 @api.route('/api/user/<string:id>', methods=['GET'])
 def get_user(id):
     log.info("get user", id=id.lower(), client=g.user.get('_id'))
-    # user: dict = mongo.db.users.find_one(
-    #     {'shib_id': id.lower()}, {'last_changed_by': 0, 'last_changed_on': 0})
-    try:    
-        user: dict = mongo.db.users.find(
-            {'shib_id': id.lower()}, {'last_changed_by': 0, 'last_changed_on': 0}
-            ).collation(Collation(locale='en', strength=2))[0]
+    try:
+        user: dict = mongo.db.users.find_one(
+            {'shib_id': re.compile(id, re.IGNORECASE)}, {'last_changed_by': 0, 'last_changed_on': 0})
         gms = _get_groups(user)
         user.update({'groups': gms})
+        
         return jsonify(user), 200
-    except:
+    except Exception as e:
+        log.warning("Exception occurred", exception=e)
         return jsonify(), 404
 
 def _get_groups(user):
