@@ -19,28 +19,24 @@ def get_users():
 def get_user(id):
     log.info("get user", id=id.lower(), client=g.user.get('_id'))
     try:
-        user = _get_user(id)
-        return jsonify(user), 200
+        user_data, status = _get_user(id)
+        return user_data, status
     except Exception as e:
         log.warning("Exception occurred", exception=e)
         log.info("retry getting user", id=id.lower(), client=g.user.get('_id'))
-
         # Wait 1 second before trying to get user again
         time.sleep(1)
-        user = _get_user(id)
-
-        if (user):
-            return jsonify(user), 200
-
-        return jsonify(), 404
+        user_data, status = _get_user(id)
+        return user_data, status
 
 def _get_user(id):
     user: dict = mongo.db.users.find_one(
-            {'shib_id': re.compile(id, re.IGNORECASE)}, {'last_changed_by': 0, 'last_changed_on': 0})
+            {'shib_id': re.compile('^{}$'.format(id), re.IGNORECASE)}, {'last_changed_by': 0, 'last_changed_on': 0})
+    if not user:
+        return jsonify(), 404
     gms = _get_groups(user)
     user.update({'groups': gms})
-
-    return user
+    return jsonify(user), 200
 
 def _get_groups(user):
     if not user.get('active'):
