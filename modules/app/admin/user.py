@@ -1,3 +1,4 @@
+from tokenize import group
 from modules.app import mongo
 from wtforms import fields, validators, form
 from flask_admin.contrib.pymongo import ModelView
@@ -48,13 +49,18 @@ class UserView(ModelView):
 
     column_searchable_list = ('last_name', 'first_name', 'email', 'shib_id')
     column_labels = dict(org_name='Organization')
-
-    # column_extra_row_actions = []
     
     form = UserForm
 
     # Enables csv export of users
     can_export = True
+
+    # ######## #
+    group_columns = [g.get('group_id') for g in mongo.db.groups.find({})]
+    col1 = ['shib_id', 'first_name', 'last_name', 'email'] # 'groups'
+    col2 = ['role', 'org_name', 'active', 'last_changed_by', 'last_changed_on']
+    column_export_list = col1 + group_columns + col2
+    # ######## #
 
     def get_list(self, page, sort_column, sort_desc, search, filters, execute=True, page_size=None):
         try:
@@ -62,11 +68,16 @@ class UserView(ModelView):
             users: Iterable[Dict] = ls[1]
             to_search = [g.get('group_id') for g in mongo.db.groups.find({})]
             gs = groups.get_for_many([u.get('shib_id') for u in users], to_search)
-
             orgs_dict = {x[0]: x[1] for x in _get_org_refs()}
 
             for user in users:
                 user['groups'] = gs.get(user.get('shib_id'))
+                
+                # ######## #
+                for i in range(0, len(to_search)):
+                    user[to_search[i]] = 1 if to_search[i] in user['groups'] else None
+                # ######## #
+                
                 org_id = user.get('organization_id')
                 if org_id:
                     user['org_name'] = orgs_dict.get(org_id, "Unknown ({})".format(org_id))
